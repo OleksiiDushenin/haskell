@@ -3,39 +3,30 @@ import Data.Char (digitToInt)
 
 adder :: IO ()
 adder = do
-            x <- readCount
-            print x
+            x <- readInteger "How many numbers? "
+            result <- adder_add x 0
+            putStrLn ("Result: " ++ show result)
 
-readCount :: IO Int
-readCount = do
-                putStrLn "How many numbers? "
-                count <- getChar
-                putChar '\n'
-                if isDigit count
-                then return (digitToInt count)
-                else do
-                        putStrLn "Invalid number"
-                        readCount
+adder_add :: Int -> Int -> IO Int
+adder_add 0 m = do
+                    return m
+adder_add n m = do
+                    x <- readInteger "Enter number: "
+                    adder_add (n - 1) (x + m)
 
-writeLine :: String -> IO ()
-writeLine [] = return ()
-writeLine (x:xs) = do
-                        putChar x
-                        writeLine xs
+readInteger :: String -> IO Int
+readInteger m =  do
+                    putStrLn m
+                    line <- getLine
+                    if isInt line
+                        then do
+                            let value = read line :: Int
+                            return value
+                        else do
+                            value <- (readInteger m)
+                            return value
 
-writeLineNew :: String -> IO ()
-writeLineNew x = do
-                        writeLine x
-                        putChar '\n'
-
-readLine :: IO String
-readLine = do
-                x <- getChar
-                if x == '\n'
-                then return []
-                else
-                    do
-                        xs <- readLine
-                        return (x : xs)
+isInt :: String -> Bool
+isInt xs = and [isDigit x | x <- xs]
 
 main = adder
